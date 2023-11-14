@@ -1,0 +1,16 @@
+server:
+  port: 7000
+spring:
+  datasource:
+    url: jdbc:mysql://124.70.180.4:3306/db_gulimall_sms?useSSL=false&serverTimezone=UTC
+    username: root
+    password: qwert@520
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
