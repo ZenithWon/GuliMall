@@ -8,6 +8,7 @@
 
 package com.atguigu.common.utils;
 
+import com.atguigu.common.exception.ErrorEnum;
 import org.apache.http.HttpStatus;
 
 import java.util.HashMap;
@@ -34,10 +35,21 @@ public class R extends HashMap<String, Object> {
 		return error(HttpStatus.SC_INTERNAL_SERVER_ERROR, msg);
 	}
 
+	public static R error(int code) {
+		return error(code, "未知异常，请联系管理员");
+	}
+
 	public static R error(int code, String msg) {
 		R r = new R();
 		r.put("code", code);
 		r.put("msg", msg);
+		return r;
+	}
+
+	public static R error(ErrorEnum errorEnum){
+		R r = new R();
+		r.put("code", errorEnum.getCode());
+		r.put("msg", errorEnum.getMsg());
 		return r;
 	}
 
