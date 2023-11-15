@@ -1,0 +1,21 @@
+spring:
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      config:
+        server-addr: xxxxxxxx
+        namespace: xxxxxxxx
+        ext-config:
+          - data-id: datasource.yaml
+            group: ${spring.profiles.active}
+            refresh: true
+          - data-id: mybatis.yaml
+            group: ${spring.profiles.active}
+            refresh: true
+          - data-id: base.yaml
+            group: ${spring.profiles.active}
+            refresh: true
+
+
+
