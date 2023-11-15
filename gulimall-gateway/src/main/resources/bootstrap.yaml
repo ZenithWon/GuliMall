@@ -1,0 +1,20 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: gulimall-gateway
+  cloud:
+    nacos:
+      config:
+        server-addr: xxxxxxxx
+        namespace: xxxxxxxx
+        ext-config:
+          - data-id: base.yaml
+            group: ${spring.profiles.active}
+            refresh: true
+          - data-id: router.yaml
+            group: ${spring.profiles.active}
+            refresh: true
+
+
+

@@ -1,0 +1,21 @@
+spring:
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      config:
+        server-addr: 124.70.180.4:8848
+        namespace: fdba5fb8-ae34-4cbb-8399-9441d75d6611
+        ext-config:
+          - data-id: datasource.yaml
+            group: ${spring.profiles.active}
+            refresh: true
+          - data-id: mybatis.yaml
+            group: ${spring.profiles.active}
+            refresh: true
+          - data-id: base.yaml
+            group: ${spring.profiles.active}
+            refresh: true
+
+
+

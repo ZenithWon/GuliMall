@@ -4,11 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.atguigu.gulimall.coupon.entity.CouponEntity;
 import com.atguigu.gulimall.coupon.service.CouponService;
@@ -33,7 +29,7 @@ public class CouponController {
     /**
      * 列表
      */
-    @RequestMapping("/list")
+    @GetMapping("/list")
     //@RequiresPermissions("coupon:coupon:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = couponService.queryPage(params);
@@ -45,7 +41,7 @@ public class CouponController {
     /**
      * 信息
      */
-    @RequestMapping("/info/{id}")
+    @GetMapping("/info/{id}")
     //@RequiresPermissions("coupon:coupon:info")
     public R info(@PathVariable("id") Long id){
 		CouponEntity coupon = couponService.getById(id);
@@ -56,7 +52,7 @@ public class CouponController {
     /**
      * 保存
      */
-    @RequestMapping("/save")
+    @PostMapping("/save")
     //@RequiresPermissions("coupon:coupon:save")
     public R save(@RequestBody CouponEntity coupon){
 		couponService.save(coupon);
@@ -67,7 +63,7 @@ public class CouponController {
     /**
      * 修改
      */
-    @RequestMapping("/update")
+    @PutMapping("/update")
     //@RequiresPermissions("coupon:coupon:update")
     public R update(@RequestBody CouponEntity coupon){
 		couponService.updateById(coupon);
@@ -78,7 +74,7 @@ public class CouponController {
     /**
      * 删除
      */
-    @RequestMapping("/delete")
+    @DeleteMapping("/delete")
     //@RequiresPermissions("coupon:coupon:delete")
     public R delete(@RequestBody Long[] ids){
 		couponService.removeByIds(Arrays.asList(ids));
