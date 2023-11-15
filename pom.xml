@@ -16,8 +16,11 @@
         <module>gulimall-product</module>
         <module>gulimall-ware</module>
         <module>gulimall-admin</module>
-        <module>renren-generator</module>
         <module>gulimall-common</module>
+        <module>gulimall-gateway</module>
+        <module>gulimall-tools</module>
+
+        <module>renren-generator</module>
     </modules>
 
 
