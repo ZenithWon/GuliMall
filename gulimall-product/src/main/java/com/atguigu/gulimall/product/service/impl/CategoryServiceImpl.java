@@ -3,6 +3,7 @@ package com.atguigu.gulimall.product.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,6 +45,17 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                 }).collect(Collectors.toList());
 
         return firstCategory;
+    }
+
+    @Override
+    public void removeCategoryByIds(List<Long> categoryIds) {
+        //FIXME：检查是否可以删除，查询是否关联
+        baseMapper.deleteBatchIds(categoryIds);
+    }
+
+    @Override
+    public void updateSort(CategoryEntity[] category) {
+        updateBatchById(Arrays.asList(category));
     }
 
     private List<CategoryEntity> getChildren(CategoryEntity current,List<CategoryEntity> all){
