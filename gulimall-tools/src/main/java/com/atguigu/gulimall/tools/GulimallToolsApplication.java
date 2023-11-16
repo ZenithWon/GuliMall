@@ -10,7 +10,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @EnableDiscoveryClient
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @EnableConfigurationProperties({MinioProperties.class})
-public class GulimallToolsApplication {
+public class  GulimallToolsApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(GulimallToolsApplication.class , args);

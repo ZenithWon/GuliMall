@@ -73,6 +73,10 @@ public class R extends HashMap<String, Object> {
 		return R.ok().put("data",obj);
 	}
 
+	public static R pageSuccess(PageUtils obj){
+		return R.ok().put("page",obj);
+	}
+
 
 
 	public R put(String key, Object value) {

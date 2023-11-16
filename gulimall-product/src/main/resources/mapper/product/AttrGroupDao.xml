@@ -12,6 +12,16 @@
         <result property="icon" column="icon"/>
         <result property="catelogId" column="catelog_id"/>
     </resultMap>
+    <select id="selectAllWithCategoryIdAndKey"
+            resultType="com.atguigu.gulimall.product.entity.AttrGroupEntity">
+        select * from db_gulimall_pms.pms_attr_group attr_group
+        <where>
+            and category_id=#{categoryId}
+            <if test="key!=null and key!=''">
+                and attr_group_name like concat('%',#{key},'%') or attr_group_id=#{key}
+            </if>
+        </where>
+    </select>
 
 
 </mapper>
