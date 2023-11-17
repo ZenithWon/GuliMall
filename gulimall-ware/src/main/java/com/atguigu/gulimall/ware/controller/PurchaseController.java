@@ -1,14 +1,11 @@
 package com.atguigu.gulimall.ware.controller;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 
+import com.atguigu.gulimall.ware.dto.MergeDto;
+import com.atguigu.gulimall.ware.dto.PurchaseCompleteDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.atguigu.gulimall.ware.entity.PurchaseEntity;
 import com.atguigu.gulimall.ware.service.PurchaseService;
@@ -41,7 +38,31 @@ public class PurchaseController {
         return R.ok().put("page", page);
     }
 
+    @RequestMapping("/unreceive/list")
+    //@RequiresPermissions("ware:purchase:info")
+    public R listUnReceivePurchase(@RequestParam Map<String, Object> params){
+        PageUtils page = purchaseService.listUnReceivePurchase(params);
+        return R.pageSuccess(page);
+    }
 
+    @PostMapping("/merge")
+    public R mergePurchaseDetail(@RequestBody MergeDto dto){
+        purchaseService.mergePurchaseDetail(dto);
+        return R.ok();
+    }
+
+    @PostMapping("/received")
+    public R receivePurchase(@RequestBody Long [] purchaseIds){
+        purchaseService.receivePurchase(purchaseIds);
+        return R.ok();
+    }
+
+
+    @PostMapping("/done")
+    public R completePurchase(@RequestBody PurchaseCompleteDto dto){
+        purchaseService.completePurchase(dto);
+        return R.ok();
+    }
     /**
      * 信息
      */
@@ -59,6 +80,8 @@ public class PurchaseController {
     @RequestMapping("/save")
     //@RequiresPermissions("ware:purchase:save")
     public R save(@RequestBody PurchaseEntity purchase){
+        purchase.setCreateTime(new Date());
+        purchase.setUpdateTime(new Date());
 		purchaseService.save(purchase);
 
         return R.ok();

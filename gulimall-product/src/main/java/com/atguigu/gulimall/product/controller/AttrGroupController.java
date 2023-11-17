@@ -1,14 +1,14 @@
 package com.atguigu.gulimall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.atguigu.gulimall.product.dto.AttrRelationDto;
+import com.atguigu.gulimall.product.entity.AttrEntity;
+import com.atguigu.gulimall.product.vo.AttrGroupWithAttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
 import com.atguigu.gulimall.product.service.AttrGroupService;
@@ -33,14 +33,46 @@ public class AttrGroupController {
     /**
      * 列表
      */
-    @RequestMapping("/list")
+    @RequestMapping("/list/{categoryId}")
     //@RequiresPermissions("product:attrgroup:list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = attrGroupService.queryPage(params);
+    public R list(@RequestParam Map<String, Object> params,@PathVariable Long categoryId){
 
+        PageUtils page = attrGroupService.queryPage(params , categoryId);
         return R.ok().put("page", page);
     }
 
+    @GetMapping("/{attrgroupId}/attr/relation")
+    public R listAttrRelationByAttrGid(@PathVariable Long attrgroupId){
+        List<AttrEntity> attrList=attrGroupService.listAttrRelationByAttrGid(attrgroupId);
+
+        return R.success(attrList);
+    }
+
+    @GetMapping("/{attrgroupId}/noattr/relation")
+    public R listAttrNoRelationByAttrGid(@RequestParam Map<String, Object> params,@PathVariable Long attrgroupId){
+        PageUtils page=attrGroupService.listAttrNoRelationByAttrGid(params,attrgroupId);
+
+        return R.pageSuccess(page);
+    }
+
+    @PostMapping("/attr/relation/delete")
+    public R deleteAttrRelationBatch(@RequestBody AttrRelationDto[] deleteDtos){
+        attrGroupService.deleteAttrRelationBatch(Arrays.asList(deleteDtos));
+        return R.ok();
+    }
+
+    @PostMapping("/attr/relation")
+    public R saveAttrRelation(@RequestBody AttrRelationDto[] relationDtos){
+        attrGroupService.saveAttrRelation(relationDtos);
+        return R.ok();
+    }
+
+    @GetMapping("/{catelogId}/withattr")
+    public R getAttrGroupWithAttrInfo(@PathVariable Long catelogId){
+        List<AttrGroupWithAttrVo> voList=attrGroupService.getAttrGroupWithAttrInfo(catelogId);
+
+        return R.success(voList);
+    }
 
     /**
      * 信息

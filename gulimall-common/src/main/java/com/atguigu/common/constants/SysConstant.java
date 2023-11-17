@@ -6,14 +6,14 @@
  * 版权所有，侵权必究！
  */
 
-package com.atguigu.common.utils;
+package com.atguigu.common.constants;
 
 /**
  * 常量
  *
  * @author Mark sunlightcs@gmail.com
  */
-public class Constant {
+public class SysConstant {
 	/** 超级管理员ID */
 	public static final int SUPER_ADMIN = 1;
     /**
