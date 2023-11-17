@@ -12,6 +12,8 @@ import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimall.product.entity.AttrEntity;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
 import com.atguigu.gulimall.product.service.AttrService;
+import com.atguigu.gulimall.product.vo.AttrGroupWithAttrVo;
+import com.atguigu.gulimall.product.vo.AttrInfoVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,6 +143,34 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
                 throw new GulimallException(ErrorEnum.DATABASE_INSERT_ERROR);
             }
         }
+    }
+
+    @Override
+    public List<AttrGroupWithAttrVo> getAttrGroupWithAttrInfo(Long catelogId) {
+        List<AttrGroupEntity> attrGroupEntities = baseMapper.selectList(
+                new LambdaQueryWrapper<AttrGroupEntity>()
+                        .eq(AttrGroupEntity::getCatelogId , catelogId)
+        );
+
+        List<AttrGroupWithAttrVo> voList = attrGroupEntities.stream()
+                .map(item -> BeanUtil.copyProperties(item , AttrGroupWithAttrVo.class))
+                .collect(Collectors.toList());
+
+        for(AttrGroupWithAttrVo vo:voList){
+            List<Long> attrIds = attrAttrgroupRelationDao.selectList(
+                    new LambdaQueryWrapper<AttrAttrgroupRelationEntity>()
+                            .eq(AttrAttrgroupRelationEntity::getAttrGroupId , vo.getAttrGroupId())
+            ).stream().map(AttrAttrgroupRelationEntity::getAttrId).collect(Collectors.toList());
+
+            List<AttrInfoVo> attrs= attrIds.stream()
+                    .map((item)->{
+                        AttrEntity attrEntity = attrDao.selectById(item);
+                        return BeanUtil.copyProperties(attrEntity,AttrInfoVo.class);
+                    }).collect(Collectors.toList());
+            vo.setAttrs(attrs);
+        }
+
+        return voList;
     }
 
     private void resolveEntity(AttrGroupEntity item){

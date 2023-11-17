@@ -2,6 +2,7 @@ package com.atguigu.gulimall.product.service;
 
 import com.atguigu.gulimall.product.dto.AttrRelationDto;
 import com.atguigu.gulimall.product.entity.AttrEntity;
+import com.atguigu.gulimall.product.vo.AttrGroupWithAttrVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
@@ -27,5 +28,7 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
     PageUtils listAttrNoRelationByAttrGid(Map<String, Object> params,Long attrgroupId);
 
     void saveAttrRelation(AttrRelationDto[] relationDtos);
+
+    List<AttrGroupWithAttrVo> getAttrGroupWithAttrInfo(Long catelogId);
 }
 

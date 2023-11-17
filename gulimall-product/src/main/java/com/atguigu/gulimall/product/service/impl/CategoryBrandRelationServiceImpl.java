@@ -4,12 +4,15 @@ import com.atguigu.common.exception.ErrorEnum;
 import com.atguigu.common.exception.GulimallException;
 import com.atguigu.gulimall.product.dao.BrandDao;
 import com.atguigu.gulimall.product.dao.CategoryDao;
+import com.atguigu.gulimall.product.entity.BrandEntity;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -68,6 +71,21 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
         if(baseMapper.insert(categoryBrandRelation)<=0){
             throw new GulimallException(ErrorEnum.DATABASE_INSERT_ERROR);
         }
+    }
+
+    @Override
+    public List<BrandEntity> listBrandsByCategoryId(Long catId) {
+        List<CategoryBrandRelationEntity> categoryBrandRelationEntities = baseMapper.selectList(
+                new LambdaQueryWrapper<CategoryBrandRelationEntity>()
+                        .eq(CategoryBrandRelationEntity::getCatelogId , catId)
+        );
+
+        List<BrandEntity> brandEntities = categoryBrandRelationEntities
+                .stream()
+                .map((item) -> brandDao.selectById(item.getBrandId()))
+                .collect(Collectors.toList());
+
+        return brandEntities;
     }
 
 }

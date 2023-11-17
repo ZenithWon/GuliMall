@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.atguigu.gulimall.product.dto.AttrRelationDto;
 import com.atguigu.gulimall.product.entity.AttrEntity;
+import com.atguigu.gulimall.product.vo.AttrGroupWithAttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,6 +65,13 @@ public class AttrGroupController {
     public R saveAttrRelation(@RequestBody AttrRelationDto[] relationDtos){
         attrGroupService.saveAttrRelation(relationDtos);
         return R.ok();
+    }
+
+    @GetMapping("/{catelogId}/withattr")
+    public R getAttrGroupWithAttrInfo(@PathVariable Long catelogId){
+        List<AttrGroupWithAttrVo> voList=attrGroupService.getAttrGroupWithAttrInfo(catelogId);
+
+        return R.success(voList);
     }
 
     /**

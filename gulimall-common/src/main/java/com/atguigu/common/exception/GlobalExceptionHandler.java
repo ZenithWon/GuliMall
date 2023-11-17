@@ -32,6 +32,7 @@ public class GlobalExceptionHandler{
     @ExceptionHandler(value = Exception.class)
     public R handlerUnknownException(Exception e){
         log.error("发生未知异常：{}",e.getMessage());
+        e.printStackTrace();
 
         return R.error(ErrorEnum.UNKNOWN_ERROR);
     }
