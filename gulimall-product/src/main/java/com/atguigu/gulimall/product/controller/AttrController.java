@@ -1,9 +1,14 @@
 package com.atguigu.gulimall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.atguigu.gulimall.product.dto.AttrDto;
+import com.atguigu.gulimall.product.dto.SpuAttrDto;
+import com.atguigu.gulimall.product.entity.ProductAttrValueEntity;
+import com.atguigu.gulimall.product.service.ProductAttrValueService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +31,22 @@ import com.atguigu.common.utils.R;
 public class AttrController {
     @Autowired
     private AttrService attrService;
+    @Autowired
+    private ProductAttrValueService productAttrValueService;
 
+    @GetMapping("/base/listforspu/{spuId}")
+    public R listAttrForSpu(@PathVariable Long spuId){
+        List<ProductAttrValueEntity> productAttrValueEntityList= productAttrValueService.listAttrForSpu(spuId);
+
+        return R.success(productAttrValueEntityList);
+    }
+
+    @PostMapping("/update/{spuId}")
+    public R updateAttrForSpu(@PathVariable Long spuId, @RequestBody List<SpuAttrDto> dtos){
+       productAttrValueService.updateAttrForSpu(spuId,dtos);
+
+        return R.ok();
+    }
     /**
      * 列表
      */

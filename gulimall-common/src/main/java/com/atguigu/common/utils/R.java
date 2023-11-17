@@ -8,6 +8,7 @@
 
 package com.atguigu.common.utils;
 
+import com.alibaba.fastjson.JSONObject;
 import com.atguigu.common.exception.ErrorEnum;
 import org.apache.http.HttpStatus;
 
@@ -86,5 +87,9 @@ public class R extends HashMap<String, Object> {
 
 	public int getCode(){
 		return (Integer) super.get("code");
+	}
+
+	public Object getData(){
+		return super.get("data");
 	}
 }

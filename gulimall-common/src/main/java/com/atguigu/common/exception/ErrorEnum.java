@@ -10,6 +10,7 @@ public enum ErrorEnum {
     DATABASE_INSERT_ERROR(10012,"数据库异常，新增失败"),
     DATABASE_UPDATE_ERROR(10013,"数据库异常，修改失败"),
     DATABASE_DELETE_ERROR(10014,"数据库异常，删除失败"),
+    PURCHASE_MERGE_ERROR(10021,"采购需求无法合并"),
     ;
 
     private int code;
