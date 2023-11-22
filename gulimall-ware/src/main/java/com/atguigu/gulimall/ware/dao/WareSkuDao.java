@@ -6,12 +6,14 @@ import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 商品库存
- * 
+ *
  * @author zenith
  * @email sunlightcs@gmail.com
  * @date 2023-11-14 14:20:07
  */
 @Mapper
 public interface WareSkuDao extends BaseMapper<WareSkuEntity> {
-	
+
+    Long getSaleStockBySkuId(Long skuId);
+
 }

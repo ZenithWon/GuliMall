@@ -17,5 +17,7 @@ public interface WareSkuService extends IService<WareSkuEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
     void addStockForSkuToWare(Long skuId,Long wareId,Integer stock);
+
+    Long getStockBySkuId(Long skuId);
 }
 

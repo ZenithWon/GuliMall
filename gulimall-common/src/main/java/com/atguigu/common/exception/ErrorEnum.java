@@ -11,6 +11,8 @@ public enum ErrorEnum {
     DATABASE_UPDATE_ERROR(10013,"数据库异常，修改失败"),
     DATABASE_DELETE_ERROR(10014,"数据库异常，删除失败"),
     PURCHASE_MERGE_ERROR(10021,"采购需求无法合并"),
+    PRODUCT_PUBLISH_ERROR(10022,"商品上架失败"),
+    ELASTICSEARCH_SAVE_ERROR(10051,"搜索服务保存失败"),
     ;
 
     private int code;

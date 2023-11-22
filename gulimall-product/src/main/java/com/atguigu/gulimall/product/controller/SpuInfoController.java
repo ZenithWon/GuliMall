@@ -50,6 +50,12 @@ public class SpuInfoController {
         return R.ok().put("spuInfo", spuInfo);
     }
 
+    @PostMapping("/{spuId}/up")
+    public R publish(@PathVariable Long spuId){
+        spuInfoService.publish(spuId);
+        return R.ok();
+    }
+
     /**
      * 保存
      */

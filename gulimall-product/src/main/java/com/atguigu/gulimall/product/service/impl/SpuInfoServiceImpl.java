@@ -2,31 +2,32 @@ package com.atguigu.gulimall.product.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
+import com.atguigu.common.constants.ProductStatusConstant;
 import com.atguigu.common.exception.ErrorEnum;
 import com.atguigu.common.exception.GulimallException;
 import com.atguigu.common.to.MemberPriceTo;
 import com.atguigu.common.to.SkuFullReductionTo;
 import com.atguigu.common.to.SkuLadderTo;
 import com.atguigu.common.to.SpuBoundsTo;
+import com.atguigu.common.to.es.SkuEsModel;
 import com.atguigu.gulimall.product.dto.ProductSaveDto;
 import com.atguigu.gulimall.product.dto.Sku;
 import com.atguigu.gulimall.product.dto.SkuImage;
 import com.atguigu.gulimall.product.entity.*;
 import com.atguigu.gulimall.product.feign.CouponFeignClient;
+import com.atguigu.gulimall.product.feign.SearchFeignClient;
+import com.atguigu.gulimall.product.feign.WareFeignClient;
 import com.atguigu.gulimall.product.service.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.atguigu.common.utils.PageUtils;
@@ -56,6 +57,14 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     SkuSaleAttrValueService skuSaleAttrValueService;
     @Autowired
     CouponFeignClient couponFeignClient;
+    @Autowired
+    BrandService brandService;
+    @Autowired
+    CategoryService categoryService;
+    @Autowired
+    WareFeignClient wareFeignClient;
+    @Autowired
+    SearchFeignClient searchFeignClient;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -123,6 +132,66 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         }
 
         dto.getSkus().forEach(item->saveSku(item,spuInfoEntity));
+    }
+
+    @Override
+    @Transactional
+    public void publish(Long spuId) {
+        List<ProductAttrValueEntity> productAttrValueEntityList =productAttrValueService.listAttrForSpu(spuId);
+        List<SkuEsModel.Attr> attrs = productAttrValueEntityList.stream().map((entity) -> {
+            AttrEntity attrEntity = attrService.getById(entity.getAttrId());
+            SkuEsModel.Attr attr = null;
+            if (attrEntity.getSearchType() == 1) {
+                attr = BeanUtil.copyProperties(entity , SkuEsModel.Attr.class);
+            }
+            return attr;
+        }).collect(Collectors.toList()).stream().filter(Objects::nonNull).collect(Collectors.toList());
+
+        List<SkuInfoEntity> skuInfoEntityList= skuInfoService.getSkuBySpuId(spuId);
+
+        List<SkuEsModel> esModels = skuInfoEntityList.stream().map((item) -> {
+            SkuEsModel model = BeanUtil.copyProperties(item , SkuEsModel.class);
+            model.setAttrs(attrs);
+            model.setSkuPrice(item.getPrice());
+            model.setSkuImg(item.getSkuDefaultImg());
+            model.setHotScore(0L);
+
+            try{
+                Integer stock=(Integer) wareFeignClient.getStock(model.getSkuId()).getData();
+                model.setHasStock(stock != null && stock > 0);
+            }catch (Exception e){
+                log.error("库存查询异常");
+                model.setHasStock(false);
+            }
+
+            BrandEntity brand = brandService.getById(model.getBrandId());
+            if(brand!=null){
+                model.setBrandName(brand.getName());
+                model.setBrandImg(brand.getLogo());
+            }
+
+            CategoryEntity category = categoryService.getById(model.getCatalogId());
+            if(category!=null){
+                model.setCatalogName(category.getName());
+            }
+            return model;
+        }).collect(Collectors.toList());
+
+        try{
+            int code = searchFeignClient.productPublish(esModels).getCode();
+            if(code!=0){
+                throw new RuntimeException();
+            }
+        }catch (Exception e){
+            throw new GulimallException(ErrorEnum.PRODUCT_PUBLISH_ERROR);
+        }
+
+        baseMapper.update(null,
+                new LambdaUpdateWrapper<SpuInfoEntity>()
+                    .eq(SpuInfoEntity::getId,spuId)
+                    .set(SpuInfoEntity::getPublishStatus,ProductStatusConstant.PUBLISH)
+                    .set(SpuInfoEntity::getUpdateTime,new Date())
+        );
     }
 
 
