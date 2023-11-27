@@ -4,6 +4,7 @@ import com.atguigu.common.exception.ErrorEnum;
 import com.atguigu.common.exception.GulimallException;
 import com.atguigu.gulimall.product.dao.CategoryBrandRelationDao;
 import com.atguigu.gulimall.product.entity.CategoryBrandRelationEntity;
+import com.atguigu.gulimall.product.vo.Catelog2Vo;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -81,6 +82,37 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         if(update<=0){
             throw new GulimallException(ErrorEnum.DATABASE_UPDATE_ERROR);
         }
+    }
+
+    @Override
+    public List<CategoryEntity> getByParentId(Long parentId) {
+        return baseMapper.selectList(
+                new LambdaUpdateWrapper<CategoryEntity>()
+                    .eq(CategoryEntity::getParentCid,parentId)
+        );
+    }
+
+    @Override
+    public Map<String, Object> getCatalogJson() {
+        List<CategoryEntity> levelOne = getByParentId(0L);
+
+        Map<String, Object> map = levelOne.stream().collect(Collectors.toMap(k -> k.getCatId().toString() , v -> {
+            List<CategoryEntity> levelTwo = getByParentId(v.getCatId());
+            List<Catelog2Vo> catelog2VoList = levelTwo.stream().map((item) -> {
+                List<CategoryEntity> levelThree = getByParentId(item.getCatId());
+
+                List<Object> catalog3VoList = levelThree.stream().map((entity) -> {
+                    return new Catelog2Vo.Catalog3Vo(entity.getParentCid().toString() , entity.getCatId().toString() , entity.getName());
+                }).collect(Collectors.toList());
+
+                return new Catelog2Vo(v.getCatId().toString() ,
+                        catalog3VoList,
+                        item.getCatId().toString() ,
+                        item.getName());
+            }).collect(Collectors.toList());
+            return catelog2VoList;
+        }));
+        return map;
     }
 
     private List<CategoryEntity> getChildren(CategoryEntity current,List<CategoryEntity> all){
