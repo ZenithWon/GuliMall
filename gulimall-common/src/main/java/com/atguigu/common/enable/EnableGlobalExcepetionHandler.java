@@ -1,5 +1,6 @@
-package com.atguigu.common.exception;
+package com.atguigu.common.enable;
 
+import com.atguigu.common.exception.GlobalExceptionHandler;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;

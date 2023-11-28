@@ -1,17 +1,27 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.atguigu.common.exception.ErrorEnum;
 import com.atguigu.common.exception.GulimallException;
+import com.atguigu.gulimall.product.constant.RedisKeys;
 import com.atguigu.gulimall.product.dao.CategoryBrandRelationDao;
 import com.atguigu.gulimall.product.entity.CategoryBrandRelationEntity;
+import com.atguigu.gulimall.product.utils.BasicDistributedLock;
 import com.atguigu.gulimall.product.vo.Catelog2Vo;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -32,6 +42,12 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired
     private CategoryBrandRelationDao categoryBrandRelationDao;
+    @Autowired
+    StringRedisTemplate redisTemplate;
+    @Autowired
+    BasicDistributedLock distributedLock;
+    @Autowired
+    RedissonClient redissonClient;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -93,7 +109,31 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     @Override
-    public Map<String, Object> getCatalogJson() {
+    public JSONObject getCatalogJson() {
+        String json=redisTemplate.opsForValue().get(RedisKeys.CATEGORY_INDEX_JSON);
+        if(StrUtil.isNotBlank(json)){
+            return JSONObject.parseObject(json);
+        }
+
+        RLock lock = redissonClient.getLock(RedisKeys.CATEGORY_INDEX_JSON_LOCK);
+        lock.lock();
+        try{
+            json = getCategoryJsonFromDb();
+            return JSONObject.parseObject(json);
+        }catch (Exception e){
+            throw new GulimallException(ErrorEnum.DATABASE_ERROR);
+        }finally {
+            lock.unlock();
+        }
+
+    }
+
+    private String getCategoryJsonFromDb(){
+        String json=redisTemplate.opsForValue().get(RedisKeys.CATEGORY_INDEX_JSON);
+        if(StrUtil.isNotBlank(json)){
+            return json;
+        }
+
         List<CategoryEntity> levelOne = getByParentId(0L);
 
         Map<String, Object> map = levelOne.stream().collect(Collectors.toMap(k -> k.getCatId().toString() , v -> {
@@ -112,7 +152,10 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             }).collect(Collectors.toList());
             return catelog2VoList;
         }));
-        return map;
+        json=JSON.toJSONString(map);
+        redisTemplate.opsForValue().set(RedisKeys.CATEGORY_INDEX_JSON,json);
+
+        return json;
     }
 
     private List<CategoryEntity> getChildren(CategoryEntity current,List<CategoryEntity> all){

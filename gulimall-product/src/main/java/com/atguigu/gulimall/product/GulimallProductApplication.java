@@ -1,6 +1,6 @@
 package com.atguigu.gulimall.product;
 
-import com.atguigu.common.exception.EnableGlobalExcepetionHandler;
+import com.atguigu.common.enable.EnableGlobalExcepetionHandler;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;

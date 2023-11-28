@@ -5,6 +5,7 @@ public enum ErrorEnum {
     VALID_EXCEPTION(10001,"参数格式校验异常"),
     ILLEGAL_REQUEST(10002,"请求不合法"),
     UPLOAD_FIGURE_FAILED(10003,"上传图片失败"),
+    REDIS_ERROR(10004,"缓存异常"),
     DATABASE_ERROR(10010,"数据库异常"),
     DATABASE_DUPLICATE_ERROR(10011,"该数据不可重复"),
     DATABASE_INSERT_ERROR(10012,"数据库异常，新增失败"),
